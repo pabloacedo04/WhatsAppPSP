@@ -1,12 +1,31 @@
 import javax.swing.*;
 import java.awt.*;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.Socket;
 
 public class Usuario extends JFrame{
     private static JTextArea chat;
     private static JTextField areaMensaje;
-
-    public static void main(String[] args) {
+    private static DataOutputStream dataOutputStream;
+    private static DataInputStream dataInputStream;
+    public static void main(String[] args){
         SwingUtilities.invokeLater(Usuario::new);
+        try {
+            Socket socket = new Socket("localhost", 6000);
+            dataOutputStream = new DataOutputStream(socket.getOutputStream());
+            dataInputStream = new DataInputStream(socket.getInputStream());
+
+            String recibo;
+            while (true) {
+                recibo = dataInputStream.readUTF();
+                chat.append(recibo + "\n");
+            }
+        }catch (IOException e){
+            System.out.println(e.getMessage());
+        }
+
     }
 
     public Usuario() {
@@ -36,7 +55,13 @@ public class Usuario extends JFrame{
     private JButton getjButton() {
         JButton sendButton = new JButton("Enviar");
         sendButton.addActionListener(e -> {
-
+            try {
+                String envio = areaMensaje.getText();
+                dataOutputStream.writeUTF(envio);
+                areaMensaje.setText("");
+            } catch (IOException ex) {
+                System.out.println(ex.getMessage());
+            }
         });
         return sendButton;
     }
