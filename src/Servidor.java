@@ -18,6 +18,7 @@ public class Servidor {
                     try {
                         DataInputStream dataInputStream = new DataInputStream(sCliente.getInputStream());
                         String mensaje;
+
                         while (true) {
                             mensaje = dataInputStream.readUTF();
                             for (DataOutputStream client : clientes) {

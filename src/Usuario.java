@@ -11,27 +11,23 @@ public class Usuario extends JFrame {
     private static DataOutputStream dataOutputStream;
     private static DataInputStream dataInputStream;
     String nombre = JOptionPane.showInputDialog("Escribe tu nombre");
-    public static void main(String[] args) {
-        try {
-            Socket socket = new Socket("localhost", 6000);
-            dataOutputStream = new DataOutputStream(socket.getOutputStream());
-            dataInputStream = new DataInputStream(socket.getInputStream());
+    public static void main(String[] args) throws IOException {
+        new Usuario();
+        Socket socket = new Socket("localhost", 6000);
+        dataOutputStream = new DataOutputStream(socket.getOutputStream());
+        dataInputStream = new DataInputStream(socket.getInputStream());
 
-            new Thread(() -> {
-                try {
-                    String recibo;
-                    while (true) {
-                        recibo = dataInputStream.readUTF();
-                        chat.append(recibo + "\n");
-                    }
-                } catch (IOException e) {
-                    System.out.println(e.getMessage());
+        new Thread(() -> {
+            try {
+                String recibo;
+                while (true) {
+                    recibo = dataInputStream.readUTF();
+                    chat.append(recibo + "\n");
                 }
-            }).start();
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
-        SwingUtilities.invokeLater(Usuario::new);
+            } catch (IOException e) {
+                System.out.println(e.getMessage());
+            }
+        }).start();
     }
 
     public Usuario() {
