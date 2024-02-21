@@ -64,7 +64,7 @@ public class Usuario extends JFrame {
         sendButton.addActionListener(e -> {
             try {
                 String envio = areaMensaje.getText();
-                dataOutputStream.writeUTF(nombre +": "+envio);
+                dataOutputStream.writeUTF(nombreFinal +": "+envio);
                 areaMensaje.setText("");
             } catch (IOException ex) {
                 System.out.println(ex.getMessage());
