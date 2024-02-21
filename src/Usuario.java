@@ -10,12 +10,17 @@ public class Usuario extends JFrame {
     private static JTextField areaMensaje;
     private static DataOutputStream dataOutputStream;
     private static DataInputStream dataInputStream;
-    String nombre = JOptionPane.showInputDialog("Escribe tu nombre");
+    private static String nombre;
+    static String nombreFinal;
     public static void main(String[] args) throws IOException {
-        new Usuario();
         Socket socket = new Socket("localhost", 6000);
         dataOutputStream = new DataOutputStream(socket.getOutputStream());
         dataInputStream = new DataInputStream(socket.getInputStream());
+
+        nombre = JOptionPane.showInputDialog("Escribe tu nombre");
+        dataOutputStream.writeUTF(nombre);
+        nombreFinal = dataInputStream.readUTF();
+        new Usuario(nombreFinal);
 
         new Thread(() -> {
             try {
@@ -30,8 +35,8 @@ public class Usuario extends JFrame {
         }).start();
     }
 
-    public Usuario() {
-        setTitle("Grupo ("+ nombre + ")");
+    public Usuario(String name) {
+        setTitle("Grupo ("+ name + ")");
         setSize(300, 400);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 

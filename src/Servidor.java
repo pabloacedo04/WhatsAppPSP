@@ -4,6 +4,7 @@ import java.util.*;
 
 public class Servidor {
     static ArrayList<String> mensajes = new ArrayList<>();
+    static ArrayList<String> nombres = new ArrayList<>();
     public static void main(String[] args) {
         ArrayList<DataOutputStream> clientes = new ArrayList<>();
         try {
@@ -13,11 +14,21 @@ public class Servidor {
             while (true) {
                 Socket sCliente = serverSocket.accept();
                 DataOutputStream dataOutputStream = new DataOutputStream(sCliente.getOutputStream());
+                DataInputStream dataInputStream = new DataInputStream(sCliente.getInputStream());
                 clientes.add(dataOutputStream);
+
+                String nombre = dataInputStream.readUTF();
+
+                for(String nombreRecibido : nombres){
+                    if (nombreRecibido.equals(nombre)) {
+                        nombre = nombre+"(2)";
+                    }
+                }
+                nombres.add(nombre);
+                dataOutputStream.writeUTF(nombre);
 
                 new Thread(() -> {
                     try {
-                        DataInputStream dataInputStream = new DataInputStream(sCliente.getInputStream());
                         String mensaje;
                         if(mensajes!=null){
                             try{
