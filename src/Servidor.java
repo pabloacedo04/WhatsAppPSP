@@ -3,6 +3,7 @@ import java.net.*;
 import java.util.*;
 
 public class Servidor {
+    static ArrayList<String> mensajes = new ArrayList<>();
     public static void main(String[] args) {
         ArrayList<DataOutputStream> clientes = new ArrayList<>();
         try {
@@ -18,9 +19,17 @@ public class Servidor {
                     try {
                         DataInputStream dataInputStream = new DataInputStream(sCliente.getInputStream());
                         String mensaje;
-
+                        if(mensajes!=null){
+                            try{
+                                escribirHistorial(mensajes, sCliente);
+                            }
+                            catch (Exception e){
+                                System.out.println(e.getMessage());
+                            }
+                        }
                         while (true) {
                             mensaje = dataInputStream.readUTF();
+                            mensajes.add(mensaje);
                             for (DataOutputStream client : clientes) {
                                 try {
                                     client.writeUTF(mensaje);
@@ -36,6 +45,13 @@ public class Servidor {
             }
         } catch (IOException e) {
             System.out.println(e.getMessage());
+        }
+    }
+
+    private static void escribirHistorial(ArrayList <String> mensajes, Socket socket) throws IOException {
+        DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+        for (int i = 0; i < mensajes.size(); i++){
+            out.writeUTF(mensajes.get(i));
         }
     }
 }
