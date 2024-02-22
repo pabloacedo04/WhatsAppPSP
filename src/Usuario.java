@@ -11,7 +11,6 @@ public class Usuario extends JFrame {
     private static DataOutputStream dataOutputStream;
     private static DataInputStream dataInputStream;
     private static String nombre;
-    static String nombreFinal;
     public static void main(String[] args) throws IOException {
         Socket socket = new Socket("localhost", 6000);
         dataOutputStream = new DataOutputStream(socket.getOutputStream());
@@ -19,8 +18,17 @@ public class Usuario extends JFrame {
 
         nombre = JOptionPane.showInputDialog("Escribe tu nombre");
         dataOutputStream.writeUTF(nombre);
-        nombreFinal = dataInputStream.readUTF();
-        new Usuario(nombreFinal);
+
+        String recibido = dataInputStream.readUTF();
+
+        while(!recibido.equalsIgnoreCase("SIRVE")){
+            JOptionPane.showMessageDialog(null, "Ese nombre ya existe");
+            nombre = JOptionPane.showInputDialog("Escribe tu nombre");
+            dataOutputStream.writeUTF(nombre);
+            recibido = dataInputStream.readUTF();
+        }
+
+        new Usuario(nombre);
 
         new Thread(() -> {
             try {
@@ -64,7 +72,7 @@ public class Usuario extends JFrame {
         sendButton.addActionListener(e -> {
             try {
                 String envio = areaMensaje.getText();
-                dataOutputStream.writeUTF(nombreFinal +": "+envio);
+                dataOutputStream.writeUTF(nombre +": "+envio);
                 areaMensaje.setText("");
             } catch (IOException ex) {
                 System.out.println(ex.getMessage());

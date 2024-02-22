@@ -11,25 +11,23 @@ public class Servidor {
             ServerSocket serverSocket = new ServerSocket(6000);
             System.out.println("Servidor escuchando en el puerto 6000...");
 
-            while (true) {
+            while(true) {
                 Socket sCliente = serverSocket.accept();
                 DataOutputStream dataOutputStream = new DataOutputStream(sCliente.getOutputStream());
                 DataInputStream dataInputStream = new DataInputStream(sCliente.getInputStream());
                 clientes.add(dataOutputStream);
 
-                String nombre = dataInputStream.readUTF();
+                String nombreRecibido = dataInputStream.readUTF();
 
-                for(String nombreRecibido : nombres){
-                    if (nombreRecibido.equals(nombre)) {
-                        nombre = nombre+"(2)";
-                    }
+                while(nombres.contains(nombreRecibido)){
+                    dataOutputStream.writeUTF("EXISTE");
+                    nombreRecibido = dataInputStream.readUTF();
                 }
-                nombres.add(nombre);
-                dataOutputStream.writeUTF(nombre);
+                dataOutputStream.writeUTF("SIRVE");
+                nombres.add(nombreRecibido);
 
                 new Thread(() -> {
                     try {
-                        String mensaje;
                         if(mensajes!=null){
                             try{
                                 escribirHistorial(mensajes, sCliente);
@@ -38,6 +36,7 @@ public class Servidor {
                                 System.out.println(e.getMessage());
                             }
                         }
+                        String mensaje;
                         while (true) {
                             mensaje = dataInputStream.readUTF();
                             mensajes.add(mensaje);
@@ -61,8 +60,8 @@ public class Servidor {
 
     private static void escribirHistorial(ArrayList <String> mensajes, Socket socket) throws IOException {
         DataOutputStream out = new DataOutputStream(socket.getOutputStream());
-        for (int i = 0; i < mensajes.size(); i++){
-            out.writeUTF(mensajes.get(i));
+        for (String mensaje : mensajes) {
+            out.writeUTF(mensaje);
         }
     }
 }
